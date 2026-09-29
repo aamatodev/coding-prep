@@ -1,0 +1,13 @@
+{
+  "name": "Two-Week Coding Prep",
+  "short_name": "Coding Prep",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F5F9",
+  "theme_color": "#16233F",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

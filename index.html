@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#16233F">
+<title>Coding Prep</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Coding Prep">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16233F; --paper:#F3F5F9; --card:#FFFFFF; --muted:#5B6B82; --line:#D7DDE7;
+  --signal:#F2B705; --signal-ink:#16233F; --done:#2F8A5B; --flag:#C8462C; --code-bg:#EEF1F6;
+  --display:"Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E8ECF3; --paper:#0E1626; --card:#18233A; --muted:#9AA8BE; --line:#2A3752;
+    --signal:#F2B705; --signal-ink:#16233F; --done:#4CC08A; --flag:#F07A5E; --code-bg:#111B2E;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E8ECF3; --paper:#0E1626; --card:#18233A; --muted:#9AA8BE; --line:#2A3752;
+  --signal:#F2B705; --signal-ink:#16233F; --done:#4CC08A; --flag:#F07A5E; --code-bg:#111B2E;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+main{max-width:640px;margin:0 auto;padding:20px 16px 110px}
+
+/* header */
+.top h1{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;letter-spacing:.01em;margin:8px 0 6px}
+.top p{margin:0;color:var(--muted)}
+.offline{margin:8px 0 0;font-size:14px;color:var(--muted)}.offline.on{color:var(--done)}
+.meter{margin:18px 0 22px;display:flex;align-items:center;gap:12px}
+.meter .bar{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--done);transition:width .3s}
+.meter span{font-family:var(--display);font-size:20px;font-weight:500;white-space:nowrap}
+
+/* boarding pass */
+.pass{display:grid;grid-template-columns:84px 1fr;width:100%;text-align:left;border:0;padding:0;margin:0 0 12px;background:transparent;cursor:pointer;position:relative}
+.pass .stub{background:var(--ink);color:var(--paper);border-radius:12px 0 0 12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.pass .stub small{font-family:var(--display);font-size:15px;opacity:.75}
+.pass .stub b{font-family:var(--display);font-size:44px;line-height:1;font-weight:700}
+.pass .body{background:var(--card);border:1px solid var(--line);border-left:2px dashed var(--line);border-radius:0 12px 12px 0;padding:14px 16px;min-width:0}
+.pass .stub::before,.pass .stub::after{content:"";position:absolute;right:-9px;width:18px;height:18px;border-radius:50%;background:var(--paper);z-index:1}
+.pass .stub::before{top:-9px}.pass .stub::after{bottom:-9px}
+.pass h3{margin:0;font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.pass .gate{color:var(--muted);font-size:15px;margin-top:2px}
+.pass .row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pips{display:flex;gap:5px}
+.pips i{width:10px;height:10px;border-radius:50%;border:2px solid var(--muted)}
+.pips i.on{background:var(--done);border-color:var(--done)}
+.status{margin-left:auto;font-size:14px;color:var(--muted)}
+.pass.next .stub{background:var(--signal);color:var(--signal-ink)}
+.pass.boarded .status{color:var(--done);font-weight:700}
+.pass.review .body{background:transparent}
+.week{font-family:var(--display);font-size:22px;font-weight:500;color:var(--muted);margin:26px 0 10px}
+
+/* day view */
+.back{background:none;border:0;padding:8px 0;color:var(--muted);cursor:pointer;font-size:16px}
+.dayhead{display:flex;align-items:baseline;gap:14px;margin:8px 0 4px}
+.dayhead b{font-family:var(--display);font-size:64px;line-height:.9;font-weight:700}
+.dayhead h2{font-family:var(--display);font-size:32px;line-height:1.05;margin:0}
+.goal{color:var(--muted);margin:6px 0 18px}
+h4{font-family:var(--display);font-size:22px;font-weight:700;margin:26px 0 8px}
+.notes{margin:0;padding-left:20px}
+.notes li{margin-bottom:8px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.5;margin:0}
+.prob{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 14px 10px;margin-bottom:12px}
+.prob.done{border-color:var(--done)}
+.ptop{display:flex;align-items:flex-start;gap:12px}
+.check{flex:none;width:30px;height:30px;border-radius:8px;border:2px solid var(--muted);background:transparent;cursor:pointer;display:grid;place-items:center;padding:0}
+.prob.done .check{background:var(--done);border-color:var(--done);color:#fff}
+.pname{flex:1;min-width:0}
+.pname strong{display:block;font-size:17px;line-height:1.3}
+.diff{font-size:13px;color:var(--muted)}
+.diff.H{color:var(--flag)}
+.flagbtn{flex:none;background:none;border:0;cursor:pointer;font-size:14px;color:var(--muted);padding:4px}
+.flagbtn.on{color:var(--flag);font-weight:700}
+.reveals{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.reveal{background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer}
+.reveal[aria-expanded="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.rtext{margin:10px 0 4px;font-size:15.5px;padding:10px 12px;border-left:3px solid var(--signal);background:var(--code-bg);border-radius:0 8px 8px 0}
+.rtext[hidden]{display:none}
+
+.stmt{margin:8px 0 0;font-size:15.5px}
+.saved{font-size:13px;color:var(--done);margin-left:8px}
+.editor{margin:12px 0 6px}
+.editor[hidden]{display:none}
+.keybar{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.keybar::-webkit-scrollbar{display:none}
+.keybar button{flex:none;min-width:40px;height:40px;border:1px solid var(--line);background:var(--card);border-radius:8px;font-family:var(--mono);font-size:16px;cursor:pointer;padding:0 10px;touch-action:manipulation}
+.keybar button:active{background:var(--signal);color:var(--signal-ink)}
+.editor textarea{display:block;width:100%;min-height:300px;resize:vertical;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;font-family:var(--mono);font-size:16px;line-height:1.5;white-space:pre;overflow:auto;tab-size:4;-webkit-text-size-adjust:100%}
+.editor textarea:focus{outline:2px solid var(--signal);outline-offset:0}
+.edfoot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:14px;color:var(--muted)}
+.edfoot button{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:14px;padding:4px 0}
+
+/* run + results */
+.edrow{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.runbtn{background:var(--signal);color:var(--signal-ink);border:0;border-radius:10px;padding:10px 18px;font-weight:700;font-size:16px;cursor:pointer}
+.runbtn:disabled{opacity:.55;cursor:default}
+.pystat{font-size:14px;color:var(--muted)}
+.results{margin-top:12px}
+.rsum{font-family:var(--display);font-size:22px;font-weight:700;margin:0 0 8px}
+.rsum.pass{color:var(--done)}.rsum.fail{color:var(--flag)}
+.rlist{list-style:none;margin:0;padding:0}
+.rlist li{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
+.rlist .mk{font-weight:700}
+.rlist li.ok .mk{color:var(--done)}.rlist li.bad .mk{color:var(--flag)}
+.rlist code{font-family:var(--mono);font-size:13.5px;word-break:break-word}
+.rlist .kv{color:var(--muted)}.rlist .kv b{color:var(--ink);font-weight:400;font-family:var(--mono);font-size:13.5px;word-break:break-word}
+.rerr{background:var(--code-bg);border-left:3px solid var(--flag);padding:10px 12px;border-radius:0 8px 8px 0;margin:0 0 8px;font-size:15px}
+.results details{margin-top:8px}.results summary{cursor:pointer;color:var(--muted);font-size:14px}
+.results pre{margin-top:6px}
+
+/* drill */
+.deckbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:15px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.flash{background:var(--card);border:1px solid var(--line);border-radius:16px;min-height:260px;padding:24px 20px;display:flex;flex-direction:column;justify-content:center;width:100%;text-align:left;cursor:pointer}
+.flash .q{font-size:20px;line-height:1.4}
+.flash .a{margin-top:18px;padding-top:16px;border-top:2px dashed var(--line);font-size:17px}
+.flash .a b{font-family:var(--display);font-size:26px;display:block;line-height:1.1;margin-bottom:4px}
+.flash .tap{color:var(--muted);font-size:14px;margin-top:18px}
+.flashnav{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.flashnav button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 18px;cursor:pointer}
+.flashnav span{color:var(--muted);font-size:15px}
+
+/* playbook */
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 16px 48px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:20px}
+.steps b{display:block}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:var(--card)}
+td,th{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-family:var(--display);font-size:17px}
+tr:last-child td{border-bottom:0}
+.plain{padding-left:20px;margin:0}.plain li{margin-bottom:8px}
+.reset{margin-top:28px;background:none;border:1px solid var(--flag);color:var(--flag);border-radius:10px;padding:10px 16px;cursor:pointer}
+
+/* tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav.tabs div{display:flex;max-width:640px;width:100%}
+nav.tabs button{flex:1;background:none;border:0;padding:12px 4px 14px;cursor:pointer;font-family:var(--display);font-size:19px;font-weight:500;color:var(--muted)}
+nav.tabs button[aria-current="page"]{color:var(--ink);font-weight:700;box-shadow:inset 0 3px 0 var(--signal)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav class="tabs" aria-label="Sections"><div>
+  <button data-tab="plan">Plan</button>
+  <button data-tab="drill">Drill</button>
+  <button data-tab="playbook">Playbook</button>
+</div></nav>
+
+<script>
+const DAYS = [
+{t:"Arrays & hashing",gate:"Hash map lookups",goal:"Trade memory for speed: turn O(n²) scans into O(n) with a set or dictionary.",
+notes:["If you're checking 'have I seen X before?', reach for a set or dict.","Counting problems → Counter / dict of frequencies. Grouping problems → dict keyed by a canonical form (sorted string, tuple of counts).","Bucket sort beats a heap when values are bounded by n (e.g. frequencies).","Always state the space cost you're paying for the speed-up."],
+code:`seen = {}
+for i, x in enumerate(nums):
+    if target - x in seen:
+        return [seen[target - x], i]
+    seen[x] = i`,
+p:[["Two Sum","E","For each number, what partner do you need? Where could you have stored it?","One pass with dict value→index; check complement before inserting. O(n) time, O(n) space."],
+["Group Anagrams","M","Anagrams share something when you sort them or count their letters.","Key = tuple(sorted(word)) or a 26-count tuple; dict of lists. O(n·k log k) or O(n·k)."],
+["Top K Frequent Elements","M","A frequency can never exceed n. Could that index an array?","Count with dict, then bucket by frequency (list of lists, size n+1), walk from high to low. O(n). Heap alternative: O(n log k)."],
+["Longest Consecutive Sequence","M","Only start counting from numbers that begin a run.","Put all in a set; for x where x-1 not in set, extend x+1, x+2… Each number visited at most twice. O(n)."]]},
+{t:"Two pointers",gate:"Converging from both ends",goal:"Use sorted order or symmetry to discard candidates each step instead of trying every pair.",
+notes:["Sorted input + 'find a pair' is almost always left/right pointers.","Ask: when I move a pointer, which candidates am I safely throwing away? Say that out loud.","3Sum = sort + fix one element + two-pointer on the rest; skip duplicates at each level.","For water/height problems, the shorter side limits the answer, so move it."],
+code:`l, r = 0, len(a) - 1
+while l < r:
+    s = a[l] + a[r]
+    if s == target: return [l, r]
+    if s < target: l += 1
+    else: r -= 1`,
+p:[["Valid Palindrome","E","Compare characters from the outside in, skipping non-alphanumerics.","l/r pointers, skip with isalnum(), compare lower(). O(n) time, O(1) space."],
+["3Sum","M","Sort first. Then fixing one number reduces it to a problem you already know.","Sort; for each i (skip dup values), two-pointer j/k for −a[i]; on match, move both and skip dups. O(n²)."],
+["Container With Most Water","M","Area is limited by the shorter line. Moving the taller one can never help.","l/r at ends, compute area, move the shorter side inward. O(n)."],
+["Trapping Rain Water","H","Water above i = min(max left, max right) − height[i].","Two pointers with leftMax/rightMax; process the side with the smaller max, since that side is bounded. O(n) time, O(1) space."]]},
+{t:"Sliding window",gate:"Grow right, shrink left",goal:"Handle 'longest/shortest contiguous subarray or substring such that…' in linear time.",
+notes:["Contiguous + optimize length → sliding window.","Expand right every step; shrink left while the window is invalid (or while valid, for 'minimum' problems).","Keep a dict of counts inside the window so validity checks are O(1).","Each index enters and leaves the window once, so the total is O(n)."],
+code:`count = {}; l = best = 0
+for r, ch in enumerate(s):
+    count[ch] = count.get(ch, 0) + 1
+    while not valid(count):
+        count[s[l]] -= 1; l += 1
+    best = max(best, r - l + 1)`,
+p:[["Best Time to Buy and Sell Stock","E","Track the cheapest price seen so far.","One pass: minPrice, maxProfit = max(maxProfit, p − minPrice). O(n)."],
+["Longest Substring Without Repeating Characters","M","When a repeat enters, where must the left edge jump to?","Dict char→last index; l = max(l, last[ch]+1). O(n)."],
+["Longest Repeating Character Replacement","M","Window is valid if length − (most frequent count) ≤ k.","Counts + maxFreq; shrink when invalid. maxFreq never needs to decrease. O(n)."],
+["Minimum Window Substring","H","Expand until all needed chars are covered, then shrink as far as possible.","need dict + 'formed' counter; on full coverage, record and shrink left. O(|s|+|t|)."]]},
+{t:"Stacks",gate:"Last in, first out",goal:"Recognize nesting and 'next greater/smaller' problems; master the monotonic stack.",
+notes:["Matching / nesting / undo → stack.","'Next greater element' or 'how far until warmer' → monotonic decreasing stack of indices.","Store indices, not values, when you need distances.","Min Stack: push (value, current min) pairs."],
+code:`stack = []  # indices, values decreasing
+for i, x in enumerate(a):
+    while stack and a[stack[-1]] < x:
+        j = stack.pop()
+        ans[j] = i - j
+    stack.append(i)`,
+p:[["Valid Parentheses","E","The most recent opener must close first.","Push openers; on closer, check top matches via a map. Stack empty at end. O(n)."],
+["Min Stack","M","Each element can remember what the min was when it arrived.","Stack of (val, min_so_far); all ops O(1)."],
+["Daily Temperatures","M","Keep days still waiting for a warmer one.","Monotonic decreasing stack of indices; pop while current is warmer, answer = i − j. O(n)."],
+["Largest Rectangle in Histogram","H","For each bar, how far can it extend left and right before a shorter bar?","Increasing stack; on pop, height × (i − new top − 1). Append a 0 sentinel. O(n)."]]},
+{t:"Binary search",gate:"Halve the search space",goal:"Binary search on arrays and on the answer itself, with bulletproof boundaries.",
+notes:["Sorted, or a monotonic yes/no condition → binary search.","'Search on the answer': if speed k works, any bigger k also works. Find the smallest that works.","Pick one template and never deviate. lo ≤ hi for exact match; lo < hi for boundaries.","Rotated array: one half is always sorted. Check which, then whether the target is inside it."],
+code:`lo, hi = 1, max(piles)
+while lo < hi:           # find first 'ok'
+    mid = (lo + hi) // 2
+    if ok(mid): hi = mid
+    else: lo = mid + 1
+return lo`,
+p:[["Binary Search","E","Classic: compare mid, drop half.","lo ≤ hi loop, return mid or −1. O(log n)."],
+["Search in Rotated Sorted Array","M","At any mid, one side is sorted.","If a[lo] ≤ a[mid], left is sorted: go left if target in [a[lo], a[mid]). Else mirror. O(log n)."],
+["Find Minimum in Rotated Sorted Array","M","Compare mid with the rightmost element.","If a[mid] > a[hi], min is right: lo = mid+1; else hi = mid. O(log n)."],
+["Koko Eating Bananas","M","If she can finish at speed k, she can at k+1 too.","Binary search k in [1, max]; hours = Σ ceil(p/k). O(n log max)."]]},
+{t:"Linked lists",gate:"Pointer surgery",goal:"Manipulate next pointers confidently; know dummy nodes and fast/slow.",
+notes:["A dummy head removes almost every edge case around the first node.","Fast/slow pointers: cycle detection, middle of list, nth from end (gap of n).","Reversal is three pointers: prev, cur, nxt. Draw it the first few times.","Talk through null checks explicitly; interviewers listen for them."],
+code:`prev, cur = None, head
+while cur:
+    nxt = cur.next
+    cur.next = prev
+    prev, cur = cur, nxt
+return prev`,
+p:[["Reverse Linked List","E","Point each node back at the previous one.","Iterative prev/cur/nxt. O(n) time, O(1) space. Also know the recursive version."],
+["Merge Two Sorted Lists","E","Always attach the smaller head.","Dummy node + tail pointer; attach the remainder at the end. O(n+m)."],
+["Linked List Cycle","E","Two runners at different speeds on a loop must meet.","Floyd: slow 1 step, fast 2 steps; meet → cycle. O(n), O(1) space."],
+["Remove Nth Node From End of List","M","Create a gap of n between two pointers.","Dummy; advance fast n+1, then move both until fast is null; skip slow.next. One pass."]]},
+{t:"Review & mock 1",gate:"Consolidate week one",goal:"Re-solve every flagged problem from memory, then run a timed mock out loud.",review:true,
+notes:["Morning: redo each flagged problem without peeking at the approach.","Run a 45-minute mock: pick one problem below, set a timer, talk the whole time.","Write your solution on paper or in Notes; trace one example by hand.","After: write down the one habit that cost you the most time."],
+code:`# Mock checklist
+# 1. Restate + examples     (3 min)
+# 2. Brute force + cost     (3 min)
+# 3. Optimize, agree plan   (8 min)
+# 4. Code                   (15 min)
+# 5. Test + edge cases      (6 min)`,
+p:[["Product of Array Except Self","M","Everything to the left times everything to the right.","Prefix product pass, then suffix pass multiplying into the output. O(n), O(1) extra."],
+["Evaluate Reverse Polish Notation","M","Operands wait on a stack until an operator arrives.","Push numbers; on operator pop b then a, push a op b. Truncate division toward zero. O(n)."],
+["Search a 2D Matrix","M","The rows, laid end to end, are one sorted array.","Binary search over 0..m·n−1, map index to (i//n, i%n). O(log mn)."]]},
+{t:"Trees I",gate:"DFS and BFS",goal:"Write recursive DFS without hesitation, and BFS by level with a queue.",
+notes:["Most tree problems are: what do I need from my children, and what do I return to my parent?","Height/depth → post-order (children first).","Level-by-level → BFS with a queue; process len(queue) nodes per level.","Diameter trick: compute a global answer while returning a different value (height)."],
+code:`def depth(node):
+    if not node: return 0
+    return 1 + max(depth(node.left),
+                   depth(node.right))`,
+p:[["Invert Binary Tree","E","Swap children, then recurse.","Swap left/right at each node recursively (or BFS). O(n)."],
+["Maximum Depth of Binary Tree","E","Depth = 1 + deeper child.","Post-order recursion. O(n) time, O(h) stack."],
+["Diameter of Binary Tree","E","The longest path through a node = left height + right height.","DFS returns height; update global best with l + r. O(n)."],
+["Binary Tree Level Order Traversal","M","Snapshot the queue length at the start of each level.","BFS with deque; inner loop over current level size. O(n)."]]},
+{t:"Trees II",gate:"BSTs and construction",goal:"Exploit BST ordering and rebuild trees from traversals.",
+notes:["BST validity needs bounds passed down, not just a parent comparison.","In-order traversal of a BST is sorted; many BST questions reduce to that.","LCA in a BST: the first node whose value sits between p and q.","Preorder gives roots; inorder tells you what's left vs right of each root."],
+code:`def valid(node, lo=-inf, hi=inf):
+    if not node: return True
+    if not lo < node.val < hi: return False
+    return (valid(node.left, lo, node.val) and
+            valid(node.right, node.val, hi))`,
+p:[["Validate Binary Search Tree","M","Every node must lie inside a range set by its ancestors.","DFS with (lo, hi) bounds, or in-order checking strictly increasing. O(n)."],
+["Lowest Common Ancestor of a BST","M","If both targets are smaller, go left; both larger, go right.","Walk from root; the split point is the LCA. O(h)."],
+["Kth Smallest Element in a BST","M","In-order visits values in sorted order.","Iterative in-order with a stack, stop at the kth pop. O(h + k)."],
+["Construct Binary Tree from Preorder and Inorder","M","preorder[0] is the root; find it in inorder to split.","Dict value→inorder index; recurse with index ranges and a moving preorder pointer. O(n)."]]},
+{t:"Graphs",gate:"Traverse and order",goal:"Model grids and dependencies as graphs; BFS, DFS and topological sort.",
+notes:["Grid = graph where neighbors are the 4 directions. Mark visited immediately.","Shortest path in unweighted graph → BFS. Multi-source BFS starts with all sources in the queue.","Prerequisites / ordering / cycle in directed graph → topological sort (Kahn's in-degree BFS).","Cloning → dict old→new so each node is copied once."],
+code:`from collections import deque
+q = deque(n for n in range(N) if indeg[n] == 0)
+order = []
+while q:
+    u = q.popleft(); order.append(u)
+    for v in adj[u]:
+        indeg[v] -= 1
+        if indeg[v] == 0: q.append(v)
+# cycle if len(order) < N`,
+p:[["Number of Islands","M","Every unvisited land cell starts a new island. Sink it.","Scan grid; DFS/BFS flood-fill each new '1', count starts. O(m·n)."],
+["Clone Graph","M","You need to know if a node was already copied.","DFS/BFS with dict original→clone; wire neighbors through the dict. O(V+E)."],
+["Course Schedule","M","Can you finish? Only if there's no cycle.","Kahn's algorithm: count processed nodes == numCourses. O(V+E)."],
+["Rotting Oranges","M","All rotten oranges spread at the same time.","Multi-source BFS by levels; minutes = levels; check fresh count left. O(m·n)."]]},
+{t:"Heaps & intervals",gate:"Priority and overlap",goal:"Use heaps for 'top k' and streaming; sort intervals before reasoning about overlap.",
+notes:["Top k largest → min-heap of size k (Python heapq is a min-heap).","Running median → max-heap for lower half, min-heap for upper; keep sizes balanced.","Interval problems: sort by start (merge) or by end (greedy scheduling).","Two intervals overlap if a.start < b.end and b.start < a.end."],
+code:`import heapq
+h = []
+for x in nums:
+    heapq.heappush(h, x)
+    if len(h) > k: heapq.heappop(h)
+return h[0]  # kth largest`,
+p:[["Kth Largest Element in an Array","M","Keep only the k biggest you've seen.","Min-heap of size k: O(n log k). Mention quickselect: O(n) average."],
+["Merge Intervals","M","After sorting by start, overlaps are always neighbors.","Sort; extend last merged end with max, or append new. O(n log n)."],
+["Non-overlapping Intervals","M","Keep the interval that ends earliest; it leaves the most room.","Sort by end; count intervals whose start < last kept end. O(n log n)."],
+["Find Median from Data Stream","H","Split numbers into a lower half and an upper half.","Max-heap (negated) + min-heap, rebalance so sizes differ by ≤ 1. add O(log n), median O(1)."]]},
+{t:"Backtracking",gate:"Choose, explore, undo",goal:"Generate subsets, permutations and combinations with one reusable template.",
+notes:["Backtracking = DFS over a decision tree. Draw the first two levels.","Template: choose → recurse → un-choose.","Subsets/combinations pass a start index to avoid reusing earlier elements; permutations use a 'used' set.","Prune early; state the exponential complexity honestly (2ⁿ, n!)."],
+code:`def bt(start, path):
+    res.append(path[:])
+    for i in range(start, len(nums)):
+        path.append(nums[i])
+        bt(i + 1, path)
+        path.pop()`,
+p:[["Subsets","M","Each element is either in or out.","Backtrack with start index, record every path. O(n·2ⁿ)."],
+["Permutations","M","At each position, try every unused number.","Backtrack with used[] or swap in place; record at length n. O(n·n!)."],
+["Combination Sum","M","You may reuse a number, so don't advance past it.","Recurse with i (not i+1) after choosing; stop when remaining < 0. Sort to prune."],
+["Word Search","M","DFS from each cell, marking the path so you don't reuse it.","Temporarily overwrite cell with '#', explore 4 dirs, restore. O(m·n·4ᴸ)."]]},
+{t:"Dynamic programming",gate:"Reuse subproblems",goal:"Define the state and recurrence first, then code bottom-up.",
+notes:["Signals: 'number of ways', 'min/max cost', 'can you reach'. Choices at each step that overlap.","Say it in this order: state → recurrence → base case → order of computation → answer location.","Start with memoized recursion if stuck; convert to a table after.","Many 1-D DPs only need the previous one or two values (O(1) space)."],
+code:`dp = [0] + [inf] * amount
+for a in range(1, amount + 1):
+    for c in coins:
+        if c <= a:
+            dp[a] = min(dp[a], dp[a - c] + 1)
+return dp[amount] if dp[amount] < inf else -1`,
+p:[["Climbing Stairs","E","To reach step n you came from n−1 or n−2.","dp[n] = dp[n−1] + dp[n−2]; two variables. O(n), O(1)."],
+["House Robber","M","At each house: rob it (skip previous) or skip it.","dp[i] = max(dp[i−1], dp[i−2] + nums[i]). O(n), O(1)."],
+["Coin Change","M","Fewest coins for amount a builds on fewest for a − coin.","Bottom-up dp over amounts (template above). O(amount·coins)."],
+["Longest Increasing Subsequence","M","dp[i] = longest ending at i.","O(n²) DP; then mention the O(n log n) patience-sort with bisect on tails."]]},
+{t:"Design & final mock",gate:"Put it together",goal:"Build small data structures from parts, then do a final timed mock.",
+notes:["LRU Cache = hash map for O(1) lookup + doubly linked list for O(1) recency updates.","Trie: each node holds children dict and an end-of-word flag.","Final mock: pick the hard problem, 45 minutes, talk the whole time.","Evening: stop learning new things. Skim your flags and the Playbook."],
+code:`class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.end = False
+
+def insert(root, word):
+    node = root
+    for ch in word:
+        node = node.children.setdefault(ch, TrieNode())
+    node.end = True`,
+p:[["LRU Cache","M","You need fast lookup and fast 'move to front'. One structure can't do both.","Dict key→node + doubly linked list with dummy head/tail; get/put O(1). Python shortcut: OrderedDict (say you'd implement it manually)."],
+["Implement Trie (Prefix Tree)","M","Walk character by character, creating nodes as needed.","Nodes with children dict + end flag; search checks end, startsWith doesn't. O(L) per op."],
+["Merge k Sorted Lists","H","Always take the smallest current head among k lists.","Min-heap of (val, idx, node); pop, attach, push next. O(N log k)."]]}
+];
+
+const LL="# ListNode has .val and .next\n", TN="# TreeNode has .val, .left, .right\n";
+const PROBS={
+"Two Sum":["Return the indices of the two numbers in nums that add up to target. Exactly one answer exists.","def twoSum(nums, target):\n    "],
+"Group Anagrams":["Group the strings that are anagrams of each other. Any order is fine.","def groupAnagrams(strs):\n    "],
+"Top K Frequent Elements":["Return the k most frequent numbers in nums.","def topKFrequent(nums, k):\n    "],
+"Longest Consecutive Sequence":["Return the length of the longest run of consecutive integers (they can appear in any order). Aim for O(n).","def longestConsecutive(nums):\n    "],
+"Valid Palindrome":["After lowercasing and keeping only letters and digits, does s read the same both ways?","def isPalindrome(s):\n    "],
+"3Sum":["Return all unique triplets in nums that sum to zero.","def threeSum(nums):\n    "],
+"Container With Most Water":["height[i] is a vertical line at x = i. Return the most water two lines can hold together with the x-axis.","def maxArea(height):\n    "],
+"Trapping Rain Water":["Given bar heights of width 1, return how much rain water is trapped between them.","def trap(height):\n    "],
+"Best Time to Buy and Sell Stock":["Buy on one day and sell on a later day. Return the max profit, or 0 if none is possible.","def maxProfit(prices):\n    "],
+"Longest Substring Without Repeating Characters":["Return the length of the longest substring whose characters are all distinct.","def lengthOfLongestSubstring(s):\n    "],
+"Longest Repeating Character Replacement":["You may change at most k characters. Return the length of the longest substring made of a single repeated letter.","def characterReplacement(s, k):\n    "],
+"Minimum Window Substring":["Return the smallest substring of s containing every character of t (with counts), or \"\" if none.","def minWindow(s, t):\n    "],
+"Valid Parentheses":["s contains only ()[]{}. Return True if every bracket is closed by the right type in the right order.","def isValid(s):\n    "],
+"Min Stack":["Design a stack where push, pop, top and getMin all run in O(1).","class MinStack:\n    def __init__(self):\n        \n\n    def push(self, val):\n        \n\n    def pop(self):\n        \n\n    def top(self):\n        \n\n    def getMin(self):\n        "],
+"Daily Temperatures":["For each day, return how many days until a warmer temperature, or 0 if there is none.","def dailyTemperatures(temperatures):\n    "],
+"Largest Rectangle in Histogram":["Bars have width 1. Return the area of the largest rectangle that fits in the histogram.","def largestRectangleArea(heights):\n    "],
+"Binary Search":["nums is sorted with distinct values. Return the index of target or −1, in O(log n).","def search(nums, target):\n    "],
+"Search in Rotated Sorted Array":["A sorted array of distinct values was rotated at an unknown pivot. Return the index of target or −1, in O(log n).","def search(nums, target):\n    "],
+"Find Minimum in Rotated Sorted Array":["Return the minimum of a rotated sorted array of distinct values, in O(log n).","def findMin(nums):\n    "],
+"Koko Eating Bananas":["Each hour Koko eats up to k bananas from one pile. Return the smallest k that finishes all piles within h hours.","def minEatingSpeed(piles, h):\n    "],
+"Reverse Linked List":["Reverse a singly linked list and return the new head.",LL+"def reverseList(head):\n    "],
+"Merge Two Sorted Lists":["Merge two sorted linked lists into one sorted list and return its head.",LL+"def mergeTwoLists(list1, list2):\n    "],
+"Linked List Cycle":["Return True if the linked list contains a cycle.",LL+"def hasCycle(head):\n    "],
+"Remove Nth Node From End of List":["Remove the nth node from the end of the list and return the head.",LL+"def removeNthFromEnd(head, n):\n    "],
+"Product of Array Except Self":["Return answer where answer[i] is the product of every element except nums[i]. No division, O(n).","def productExceptSelf(nums):\n    "],
+"Evaluate Reverse Polish Notation":["Evaluate a list of tokens in postfix notation with + − * /. Division truncates toward zero.","def evalRPN(tokens):\n    "],
+"Search a 2D Matrix":["Each row is sorted, and each row starts after the previous row ends. Return True if target is present.","def searchMatrix(matrix, target):\n    "],
+"Invert Binary Tree":["Mirror the tree left to right and return its root.",TN+"def invertTree(root):\n    "],
+"Maximum Depth of Binary Tree":["Return the number of nodes on the longest root-to-leaf path.",TN+"def maxDepth(root):\n    "],
+"Diameter of Binary Tree":["Return the number of edges on the longest path between any two nodes.",TN+"def diameterOfBinaryTree(root):\n    "],
+"Binary Tree Level Order Traversal":["Return the node values level by level, as a list of lists.",TN+"def levelOrder(root):\n    "],
+"Validate Binary Search Tree":["Return True if the tree is a valid BST (left subtree strictly smaller, right strictly larger).",TN+"def isValidBST(root):\n    "],
+"Lowest Common Ancestor of a BST":["Return the lowest node in the BST that has both p and q as descendants (a node counts as its own descendant).",TN+"def lowestCommonAncestor(root, p, q):\n    "],
+"Kth Smallest Element in a BST":["Return the kth smallest value in the BST (1-indexed).",TN+"def kthSmallest(root, k):\n    "],
+"Construct Binary Tree from Preorder and Inorder":["Build the tree from its preorder and inorder traversals. Values are distinct.",TN+"def buildTree(preorder, inorder):\n    "],
+"Number of Islands":["grid holds \"1\" (land) and \"0\" (water). Count islands connected up, down, left and right.","def numIslands(grid):\n    "],
+"Clone Graph":["Return a deep copy of a connected undirected graph. Each node has .val and .neighbors.","def cloneGraph(node):\n    "],
+"Course Schedule":["prerequisites[i] = [a, b] means take b before a. Can all numCourses be finished?","def canFinish(numCourses, prerequisites):\n    "],
+"Rotting Oranges":["0 is empty, 1 fresh, 2 rotten. Each minute, rot spreads to adjacent fresh oranges. Return minutes until none are fresh, or −1.","def orangesRotting(grid):\n    "],
+"Kth Largest Element in an Array":["Return the kth largest element (by sorted order, not distinct).","def findKthLargest(nums, k):\n    "],
+"Merge Intervals":["Merge all overlapping intervals and return the result.","def merge(intervals):\n    "],
+"Non-overlapping Intervals":["Return the fewest intervals to remove so the rest don't overlap. Touching ends don't count as overlap.","def eraseOverlapIntervals(intervals):\n    "],
+"Find Median from Data Stream":["Design addNum(num) and findMedian() for a growing stream of numbers.","class MedianFinder:\n    def __init__(self):\n        \n\n    def addNum(self, num):\n        \n\n    def findMedian(self):\n        "],
+"Subsets":["nums has distinct values. Return every possible subset.","def subsets(nums):\n    "],
+"Permutations":["nums has distinct values. Return every permutation.","def permute(nums):\n    "],
+"Combination Sum":["Candidates are distinct and can be reused. Return all unique combinations that sum to target.","def combinationSum(candidates, target):\n    "],
+"Word Search":["Return True if word can be traced through adjacent cells of board, using each cell at most once.","def exist(board, word):\n    "],
+"Climbing Stairs":["You climb 1 or 2 steps at a time. How many distinct ways reach step n?","def climbStairs(n):\n    "],
+"House Robber":["You can't rob two adjacent houses. Return the most money you can take.","def rob(nums):\n    "],
+"Coin Change":["Return the fewest coins that make amount, or −1 if impossible. Coins can be reused.","def coinChange(coins, amount):\n    "],
+"Longest Increasing Subsequence":["Return the length of the longest strictly increasing subsequence.","def lengthOfLIS(nums):\n    "],
+"LRU Cache":["get(key) returns the value or −1. put(key, value) inserts and evicts the least recently used key when over capacity. Both O(1).","class LRUCache:\n    def __init__(self, capacity):\n        \n\n    def get(self, key):\n        \n\n    def put(self, key, value):\n        "],
+"Implement Trie (Prefix Tree)":["Implement insert(word), search(word) and startsWith(prefix).","class Trie:\n    def __init__(self):\n        \n\n    def insert(self, word):\n        \n\n    def search(self, word):\n        \n\n    def startsWith(self, prefix):\n        "],
+"Merge k Sorted Lists":["Merge k sorted linked lists into one sorted list and return its head.",LL+"def mergeKLists(lists):\n    "]
+};
+
+const CARDS = [
+["Find two numbers that add to a target in an unsorted array.","Hash map","Store value → index; check the complement. O(n)."],
+["Longest substring/subarray satisfying a condition.","Sliding window","Expand right, shrink left while invalid."],
+["Pair or triplet in a sorted array.","Two pointers","Move the pointer that discards the fewest good candidates."],
+["For each element, the next larger element to its right.","Monotonic stack","Decreasing stack of indices; pop when a bigger value arrives."],
+["Minimum speed/capacity that still finishes within a limit.","Binary search on the answer","The 'works' condition is monotonic."],
+["Detect a cycle, or find the middle, of a linked list.","Fast & slow pointers","Fast moves 2, slow moves 1."],
+["Shortest number of steps in a grid or unweighted graph.","BFS","Level by level from the source(s)."],
+["Order tasks with prerequisites; detect impossible orderings.","Topological sort","Kahn's algorithm on in-degrees."],
+["Count connected regions in a grid.","DFS/BFS flood fill","Each unvisited start is a new component."],
+["Kth largest, or top k frequent.","Heap (size k)","Min-heap evicts the smallest; or bucket sort by frequency."],
+["Median of a stream of numbers.","Two heaps","Max-heap lower half, min-heap upper half."],
+["Merge or schedule overlapping ranges.","Sort + sweep","Sort by start to merge, by end to schedule greedily."],
+["Generate all subsets, permutations or combinations.","Backtracking","Choose → explore → un-choose."],
+["Count ways or minimize cost with overlapping choices.","Dynamic programming","State, recurrence, base case, order."],
+["Prefix lookups on a set of words.","Trie","Node per character with an end flag."],
+["O(1) get and O(1) eviction of least recently used.","Hash map + doubly linked list","Map finds the node; list tracks recency."],
+["Product or sum of everything except index i.","Prefix & suffix passes","Two sweeps, no division."],
+["Is a binary tree a valid BST?","DFS with bounds","Pass (low, high) down; or check in-order is increasing."],
+["Path length between any two nodes of a tree.","DFS returning height","Update a global answer with left + right."],
+["Search a rotated sorted array.","Modified binary search","One half around mid is always sorted."]
+];
+const COMPLEX = [
+["What's the time complexity of heappush / heappop?","O(log n)","heapify on a list is O(n)."],
+["Cost of sorting, and when is it worth it?","O(n log n)","Worth it when it unlocks two pointers, greedy or binary search."],
+["Lookup / insert in a Python dict or set?","O(1) average","Worst case O(n) with collisions; rarely worth mentioning unless asked."],
+["BFS / DFS on a graph?","O(V + E)","Grid: O(rows × cols)."],
+["Recursion space on a tree?","O(h)","h = log n if balanced, n if skewed."],
+["Slicing or copying a list in Python?","O(k)","Avoid slicing inside loops when you can pass indices."],
+["Generating all subsets / all permutations?","O(n·2ⁿ) / O(n·n!)","Output size dominates; say so."],
+["x in list vs x in set?","O(n) vs O(1)","A common hidden quadratic."]
+];
+
+const KEY="applePrep.v1";
+let S={done:{},flag:{},tab:"plan",day:null,deck:"patterns",ci:0,flip:false};
+try{const raw=localStorage.getItem(KEY);if(raw)Object.assign(S,JSON.parse(raw),{flip:false});}catch(e){}
+const PY_HARNESS="import sys, io, json, traceback, ast\n\n_LIMIT = 300000\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n    def __repr__(self):\n        return \"ListNode(\" + repr(self.val) + \")\"\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n    def __repr__(self):\n        return \"TreeNode(\" + repr(self.val) + \")\"\n\nclass Node:\n    def __init__(self, val=0, neighbors=None):\n        self.val = val\n        self.neighbors = neighbors if neighbors is not None else []\n    def __repr__(self):\n        return \"Node(\" + repr(self.val) + \")\"\n\nclass _Alias:\n    def __getitem__(self, x):\n        return x\n    def __call__(self, *a):\n        return None\n\ndef L(a):\n    d = ListNode(); t = d\n    for x in a:\n        t.next = ListNode(x); t = t.next\n    return d.next\n\ndef toL(h, cap=10000):\n    out = []\n    while h is not None and len(out) < cap:\n        out.append(h.val); h = h.next\n    return out\n\ndef cyc(a, pos):\n    h = L(a)\n    if pos < 0 or h is None:\n        return h\n    nodes = []; t = h\n    while t:\n        nodes.append(t); t = t.next\n    nodes[-1].next = nodes[pos]\n    return h\n\ndef T(a):\n    if not a or a[0] is None:\n        return None\n    root = TreeNode(a[0]); q = [root]; i = 1; qi = 0\n    while qi < len(q) and i < len(a):\n        n = q[qi]; qi += 1\n        if i < len(a) and a[i] is not None:\n            n.left = TreeNode(a[i]); q.append(n.left)\n        i += 1\n        if i < len(a) and a[i] is not None:\n            n.right = TreeNode(a[i]); q.append(n.right)\n        i += 1\n    return root\n\ndef toT(root):\n    out = []; q = [root]; qi = 0\n    while qi < len(q):\n        n = q[qi]; qi += 1\n        if n is None:\n            out.append(None)\n        else:\n            out.append(n.val); q.append(n.left); q.append(n.right)\n    while out and out[-1] is None:\n        out.pop()\n    return out\n\ndef find(root, v):\n    while root and root.val != v:\n        root = root.left if v < root.val else root.right\n    return root\n\ndef G(adj):\n    if not adj:\n        return None\n    nodes = [Node(i + 1) for i in range(len(adj))]\n    for i, nb in enumerate(adj):\n        nodes[i].neighbors = [nodes[j - 1] for j in nb]\n    return nodes[0]\n\ndef toG(node, original=None):\n    if node is None:\n        return []\n    seen = {}; order = [node]; seen[id(node)] = node; i = 0\n    while i < len(order):\n        for nb in order[i].neighbors:\n            if id(nb) not in seen:\n                seen[id(nb)] = nb; order.append(nb)\n        i += 1\n    if original is not None:\n        orig_ids = set()\n        stack = [original]; vis = {id(original)}\n        while stack:\n            n = stack.pop(); orig_ids.add(id(n))\n            for nb in n.neighbors:\n                if id(nb) not in vis:\n                    vis.add(id(nb)); stack.append(nb)\n        if any(id(n) in orig_ids for n in order):\n            return \"reused original nodes (not a deep copy)\"\n    order.sort(key=lambda n: n.val)\n    return [sorted(nb.val for nb in n.neighbors) for n in order]\n\ndef clone_case(fn, adj):\n    g = G(adj)\n    return toG(fn(g), g)\n\ndef ops(cls_name, names, args):\n    out = [None]\n    obj = _NS[cls_name](*args[0])\n    for n, a in zip(names[1:], args[1:]):\n        out.append(getattr(obj, n)(*a))\n    return out\n\n_NS = {}\n\ndef _norm(x):\n    if isinstance(x, tuple):\n        return [_norm(v) for v in x]\n    if isinstance(x, list):\n        return [_norm(v) for v in x]\n    return x\n\ndef _deep_sort(x):\n    if isinstance(x, (list, tuple)):\n        items = [_deep_sort(v) for v in x]\n        try:\n            return sorted(items, key=lambda v: json.dumps(v))\n        except Exception:\n            return items\n    return x\n\ndef _cmp(got, exp, mode):\n    got = _norm(got); exp = _norm(exp)\n    if mode == \"eq\":\n        return got == exp\n    if mode == \"sorted\":\n        try:\n            return sorted(got) == sorted(exp)\n        except Exception:\n            return False\n    if mode == \"deep\":\n        return _deep_sort(got) == _deep_sort(exp)\n    if mode == \"float\":\n        try:\n            return abs(float(got) - float(exp)) < 1e-5\n        except Exception:\n            return False\n    if mode == \"ops\":\n        if not isinstance(got, list) or len(got) != len(exp):\n            return False\n        for g, e in zip(got, exp):\n            if e is None:\n                continue\n            if isinstance(e, float):\n                if not isinstance(g, (int, float)) or abs(g - e) > 1e-5:\n                    return False\n            elif g != e:\n                return False\n        return True\n    return got == exp\n\ndef _short(x, n=160):\n    try:\n        s = repr(_norm(x))\n    except Exception:\n        s = \"<unprintable>\"\n    return s if len(s) <= n else s[:n] + \"\u2026\"\n\ndef _walk(node):\n    stack = [node]\n    while stack:\n        n = stack.pop()\n        yield n\n        for f in getattr(n, \"_fields\", ()) or ():\n            v = getattr(n, f, None)\n            if isinstance(v, (list, tuple)):\n                for item in v:\n                    if hasattr(item, \"_fields\"):\n                        stack.append(item)\n            elif hasattr(v, \"_fields\") and not isinstance(v, type):\n                stack.append(v)\n\ndef _instrument(src):\n    tree = ast.parse(src, \"<solution>\", \"exec\")\n    lines = src.split(\"\\n\")\n    pts = []\n    for node in _walk(tree):\n        if isinstance(node, ast.While):\n            t = node.test\n            pts.append((t.lineno, t.col_offset, 1, \"_tick() or (\"))\n            pts.append((t.end_lineno, t.end_col_offset, 0, \")\"))\n        elif isinstance(node, ast.For):\n            t = node.iter\n            pts.append((t.lineno, t.col_offset, 1, \"_tk(\"))\n            pts.append((t.end_lineno, t.end_col_offset, 0, \")\"))\n    pts.sort(reverse=True)\n    for ln, col, _, text in pts:\n        line = lines[ln - 1]\n        lines[ln - 1] = line[:col] + text + line[col:]\n    return \"\\n\".join(lines)\n\ndef _line_of(e):\n    ln = None\n    for f in traceback.extract_tb(e.__traceback__):\n        if f.filename in (\"<solution>\", \"<string>\"):\n            ln = f.lineno\n    return ln\n\ndef run(user_src, test_src):\n    global _NS\n    res = {\"compile\": None, \"cases\": [], \"stdout\": \"\"}\n    out = io.StringIO()\n    old = sys.stdout\n    sys.stdout = out\n    counter = [0]\n    class StepLimit(Exception):\n        pass\n    def _tick():\n        counter[0] += 1\n        if counter[0] > _LIMIT:\n            raise StepLimit(\"stopped after too many steps; check for an infinite loop\")\n    def _tk(it):\n        for x in it:\n            _tick()\n            yield x\n    g = {\"__name__\": \"solution\", \"_tk\": _tk, \"ListNode\": ListNode, \"TreeNode\": TreeNode, \"Node\": Node,\n         \"List\": _Alias(), \"Optional\": _Alias(), \"Dict\": _Alias(), \"Tuple\": _Alias(), \"Set\": _Alias(),\n         \"_tick\": _tick}\n    _NS = g\n    try:\n        try:\n            try:\n                inst = _instrument(user_src)\n            except SyntaxError:\n                raise\n            except Exception:\n                inst = user_src\n            compile(inst, \"<solution>\", \"exec\")\n        except SyntaxError as e:\n            res[\"compile\"] = {\"type\": type(e).__name__, \"msg\": str(e.msg if hasattr(e, \"msg\") else e), \"line\": e.lineno}\n            return json.dumps(res)\n        try:\n            counter[0] = 0\n            exec(inst, g)\n        except BaseException as e:\n            res[\"compile\"] = {\"type\": type(e).__name__, \"msg\": str(e), \"line\": _line_of(e)}\n            return json.dumps(res)\n        if \"Solution\" in g and isinstance(g[\"Solution\"], type):\n            try:\n                s = g[\"Solution\"]()\n                for name in dir(s):\n                    if not name.startswith(\"_\") and name not in g:\n                        g[name] = getattr(s, name)\n            except Exception:\n                pass\n        helpers = {\"L\": L, \"toL\": toL, \"cyc\": cyc, \"T\": T, \"toT\": toT, \"find\": find,\n                   \"G\": G, \"toG\": toG, \"clone_case\": clone_case, \"ops\": ops}\n        cases = []\n        def case(expr, exp, mode=\"eq\", show=None):\n            cases.append((expr, exp, mode, show or expr))\n        tg = dict(helpers); tg[\"case\"] = case\n        exec(test_src, tg)\n        env = dict(g); env.update(helpers)\n        stopped = False\n        for expr, exp, mode, show in cases:\n            counter[0] = 0\n            if stopped:\n                res[\"cases\"].append({\"label\": show, \"exp\": _short(exp), \"ok\": False, \"skipped\": True})\n                continue\n            item = {\"label\": show, \"exp\": _short(exp)}\n            try:\n                got = eval(compile(expr, \"<test>\", \"eval\"), env)\n                item[\"ok\"] = bool(_cmp(got, exp, mode))\n                item[\"got\"] = _short(got)\n            except BaseException as e:\n                item[\"ok\"] = False\n                item[\"err\"] = {\"type\": type(e).__name__, \"msg\": str(e), \"line\": _line_of(e)}\n                if isinstance(e, StepLimit):\n                    stopped = True\n                if isinstance(e, NameError):\n                    item[\"err\"][\"msg\"] += \" (check the function name matches the starter)\"\n            res[\"cases\"].append(item)\n    finally:\n        sys.stdout = old\n        res[\"stdout\"] = out.getvalue()[:4000]\n    return json.dumps(res)\n";
+const PY_TESTS={"Two Sum": "\ncase(\"sorted(twoSum([2,7,11,15], 9))\", [0,1], show=\"twoSum([2,7,11,15], 9)\")\ncase(\"sorted(twoSum([3,2,4], 6))\", [1,2], show=\"twoSum([3,2,4], 6)\")\ncase(\"sorted(twoSum([3,3], 6))\", [0,1], show=\"twoSum([3,3], 6)\")\ncase(\"sorted(twoSum([-1,-2,-3,-4,-5], -8))\", [2,4], show=\"twoSum([-1,-2,-3,-4,-5], -8)\")\n", "Group Anagrams": "\ncase('groupAnagrams([\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"])', [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]], \"deep\")\ncase('groupAnagrams([\"\"])', [[\"\"]], \"deep\")\ncase('groupAnagrams([\"a\"])', [[\"a\"]], \"deep\")\ncase('groupAnagrams([\"ab\",\"ba\",\"abc\",\"cab\",\"x\"])', [[\"ab\",\"ba\"],[\"abc\",\"cab\"],[\"x\"]], \"deep\")\n", "Top K Frequent Elements": "\ncase(\"topKFrequent([1,1,1,2,2,3], 2)\", [1,2], \"sorted\")\ncase(\"topKFrequent([1], 1)\", [1], \"sorted\")\ncase(\"topKFrequent([4,4,5,5,5,6,7,7,7,7], 2)\", [5,7], \"sorted\")\ncase(\"topKFrequent([-1,-1,2], 1)\", [-1], \"sorted\")\n", "Longest Consecutive Sequence": "\ncase(\"longestConsecutive([100,4,200,1,3,2])\", 4)\ncase(\"longestConsecutive([0,3,7,2,5,8,4,6,0,1])\", 9)\ncase(\"longestConsecutive([])\", 0)\ncase(\"longestConsecutive([1,2,0,1])\", 3)\ncase(\"longestConsecutive(list(range(3000,0,-1)))\", 3000, show=\"longestConsecutive([3000, 2999, \u2026, 1])\")\n", "Valid Palindrome": "\ncase('isPalindrome(\"A man, a plan, a canal: Panama\")', True)\ncase('isPalindrome(\"race a car\")', False)\ncase('isPalindrome(\" \")', True)\ncase('isPalindrome(\"0P\")', False)\n", "3Sum": "\ncase(\"threeSum([-1,0,1,2,-1,-4])\", [[-1,-1,2],[-1,0,1]], \"deep\")\ncase(\"threeSum([0,1,1])\", [], \"deep\")\ncase(\"threeSum([0,0,0,0])\", [[0,0,0]], \"deep\")\ncase(\"threeSum([-2,0,1,1,2])\", [[-2,0,2],[-2,1,1]], \"deep\")\n", "Container With Most Water": "\ncase(\"maxArea([1,8,6,2,5,4,8,3,7])\", 49)\ncase(\"maxArea([1,1])\", 1)\ncase(\"maxArea([4,3,2,1,4])\", 16)\ncase(\"maxArea([1,2,1])\", 2)\n", "Trapping Rain Water": "\ncase(\"trap([0,1,0,2,1,0,1,3,2,1,2,1])\", 6)\ncase(\"trap([4,2,0,3,2,5])\", 9)\ncase(\"trap([])\", 0)\ncase(\"trap([5,4,1,2])\", 1)\n", "Best Time to Buy and Sell Stock": "\ncase(\"maxProfit([7,1,5,3,6,4])\", 5)\ncase(\"maxProfit([7,6,4,3,1])\", 0)\ncase(\"maxProfit([2,4,1])\", 2)\ncase(\"maxProfit([1])\", 0)\n", "Longest Substring Without Repeating Characters": "\ncase('lengthOfLongestSubstring(\"abcabcbb\")', 3)\ncase('lengthOfLongestSubstring(\"bbbbb\")', 1)\ncase('lengthOfLongestSubstring(\"pwwkew\")', 3)\ncase('lengthOfLongestSubstring(\"\")', 0)\ncase('lengthOfLongestSubstring(\"abba\")', 2)\n", "Longest Repeating Character Replacement": "\ncase('characterReplacement(\"ABAB\", 2)', 4)\ncase('characterReplacement(\"AABABBA\", 1)', 4)\ncase('characterReplacement(\"AAAA\", 0)', 4)\ncase('characterReplacement(\"ABCDE\", 1)', 2)\n", "Minimum Window Substring": "\ncase('minWindow(\"ADOBECODEBANC\", \"ABC\")', \"BANC\")\ncase('minWindow(\"a\", \"a\")', \"a\")\ncase('minWindow(\"a\", \"aa\")', \"\")\ncase('minWindow(\"aa\", \"aa\")', \"aa\")\n", "Valid Parentheses": "\ncase('isValid(\"()\")', True)\ncase('isValid(\"()[]{}\")', True)\ncase('isValid(\"(]\")', False)\ncase('isValid(\"([)]\")', False)\ncase('isValid(\"{[]}\")', True)\ncase('isValid(\"((\")', False)\n", "Min Stack": "\ncase('ops(\"MinStack\", [\"MinStack\",\"push\",\"push\",\"push\",\"getMin\",\"pop\",\"top\",\"getMin\"], [[],[-2],[0],[-3],[],[],[],[]])', [None,None,None,None,-3,None,0,-2], \"ops\", show=\"push -2, 0, -3 \u2192 getMin, pop, top, getMin\")\ncase('ops(\"MinStack\", [\"MinStack\",\"push\",\"push\",\"getMin\",\"pop\",\"getMin\"], [[],[1],[1],[],[],[]])', [None,None,None,1,None,1], \"ops\", show=\"push 1, 1 \u2192 getMin, pop, getMin\")\n", "Daily Temperatures": "\ncase(\"dailyTemperatures([73,74,75,71,69,72,76,73])\", [1,1,4,2,1,1,0,0])\ncase(\"dailyTemperatures([30,40,50,60])\", [1,1,1,0])\ncase(\"dailyTemperatures([30,60,90])\", [1,1,0])\ncase(\"dailyTemperatures([90,80,70])\", [0,0,0])\n", "Largest Rectangle in Histogram": "\ncase(\"largestRectangleArea([2,1,5,6,2,3])\", 10)\ncase(\"largestRectangleArea([2,4])\", 4)\ncase(\"largestRectangleArea([1,1,1,1])\", 4)\ncase(\"largestRectangleArea([6,2,5,4,5,1,6])\", 12)\n", "Binary Search": "\ncase(\"search([-1,0,3,5,9,12], 9)\", 4)\ncase(\"search([-1,0,3,5,9,12], 2)\", -1)\ncase(\"search([5], 5)\", 0)\ncase(\"search([1,3], 3)\", 1)\n", "Search in Rotated Sorted Array": "\ncase(\"search([4,5,6,7,0,1,2], 0)\", 4)\ncase(\"search([4,5,6,7,0,1,2], 3)\", -1)\ncase(\"search([1], 0)\", -1)\ncase(\"search([3,1], 1)\", 1)\ncase(\"search([5,1,3], 5)\", 0)\n", "Find Minimum in Rotated Sorted Array": "\ncase(\"findMin([3,4,5,1,2])\", 1)\ncase(\"findMin([4,5,6,7,0,1,2])\", 0)\ncase(\"findMin([11,13,15,17])\", 11)\ncase(\"findMin([2,1])\", 1)\n", "Koko Eating Bananas": "\ncase(\"minEatingSpeed([3,6,7,11], 8)\", 4)\ncase(\"minEatingSpeed([30,11,23,4,20], 5)\", 30)\ncase(\"minEatingSpeed([30,11,23,4,20], 6)\", 23)\ncase(\"minEatingSpeed([1000000000], 2)\", 500000000)\n", "Reverse Linked List": "\ncase(\"toL(reverseList(L([1,2,3,4,5])))\", [5,4,3,2,1], show=\"reverseList(1\u21922\u21923\u21924\u21925)\")\ncase(\"toL(reverseList(L([1,2])))\", [2,1], show=\"reverseList(1\u21922)\")\ncase(\"toL(reverseList(L([])))\", [], show=\"reverseList(empty)\")\n", "Merge Two Sorted Lists": "\ncase(\"toL(mergeTwoLists(L([1,2,4]), L([1,3,4])))\", [1,1,2,3,4,4], show=\"merge(1\u21922\u21924, 1\u21923\u21924)\")\ncase(\"toL(mergeTwoLists(L([]), L([])))\", [], show=\"merge(empty, empty)\")\ncase(\"toL(mergeTwoLists(L([]), L([0])))\", [0], show=\"merge(empty, 0)\")\ncase(\"toL(mergeTwoLists(L([5]), L([1,2,3])))\", [1,2,3,5], show=\"merge(5, 1\u21922\u21923)\")\n", "Linked List Cycle": "\ncase(\"hasCycle(cyc([3,2,0,-4], 1))\", True, show=\"3\u21922\u21920\u2192-4, tail links to index 1\")\ncase(\"hasCycle(cyc([1,2], 0))\", True, show=\"1\u21922, tail links to index 0\")\ncase(\"hasCycle(cyc([1], -1))\", False, show=\"1, no cycle\")\ncase(\"hasCycle(cyc([], -1))\", False, show=\"empty list\")\n", "Remove Nth Node From End of List": "\ncase(\"toL(removeNthFromEnd(L([1,2,3,4,5]), 2))\", [1,2,3,5], show=\"remove 2nd from end of 1\u21922\u21923\u21924\u21925\")\ncase(\"toL(removeNthFromEnd(L([1]), 1))\", [], show=\"remove 1st from end of 1\")\ncase(\"toL(removeNthFromEnd(L([1,2]), 1))\", [1], show=\"remove 1st from end of 1\u21922\")\ncase(\"toL(removeNthFromEnd(L([1,2]), 2))\", [2], show=\"remove 2nd from end of 1\u21922\")\n", "Product of Array Except Self": "\ncase(\"productExceptSelf([1,2,3,4])\", [24,12,8,6])\ncase(\"productExceptSelf([-1,1,0,-3,3])\", [0,0,9,0,0])\ncase(\"productExceptSelf([2,3])\", [3,2])\n", "Evaluate Reverse Polish Notation": "\ncase('evalRPN([\"2\",\"1\",\"+\",\"3\",\"*\"])', 9)\ncase('evalRPN([\"4\",\"13\",\"5\",\"/\",\"+\"])', 6)\ncase('evalRPN([\"10\",\"6\",\"9\",\"3\",\"+\",\"-11\",\"*\",\"/\",\"*\",\"17\",\"+\",\"5\",\"+\"])', 22)\ncase('evalRPN([\"7\",\"-2\",\"/\"])', -3)\n", "Search a 2D Matrix": "\ncase(\"searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 3)\", True)\ncase(\"searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 13)\", False)\ncase(\"searchMatrix([[1]], 1)\", True)\ncase(\"searchMatrix([[1,3]], 3)\", True)\n", "Invert Binary Tree": "\ncase(\"toT(invertTree(T([4,2,7,1,3,6,9])))\", [4,7,2,9,6,3,1], show=\"invertTree([4,2,7,1,3,6,9])\")\ncase(\"toT(invertTree(T([2,1,3])))\", [2,3,1], show=\"invertTree([2,1,3])\")\ncase(\"toT(invertTree(T([])))\", [], show=\"invertTree([])\")\n", "Maximum Depth of Binary Tree": "\ncase(\"maxDepth(T([3,9,20,None,None,15,7]))\", 3, show=\"maxDepth([3,9,20,null,null,15,7])\")\ncase(\"maxDepth(T([1,None,2]))\", 2, show=\"maxDepth([1,null,2])\")\ncase(\"maxDepth(T([]))\", 0, show=\"maxDepth([])\")\n", "Diameter of Binary Tree": "\ncase(\"diameterOfBinaryTree(T([1,2,3,4,5]))\", 3, show=\"diameter([1,2,3,4,5])\")\ncase(\"diameterOfBinaryTree(T([1,2]))\", 1, show=\"diameter([1,2])\")\ncase(\"diameterOfBinaryTree(T([1,2,None,3,4,5,None,None,6]))\", 4, show=\"diameter([1,2,null,3,4,5,null,null,6])\")\n", "Binary Tree Level Order Traversal": "\ncase(\"levelOrder(T([3,9,20,None,None,15,7]))\", [[3],[9,20],[15,7]], show=\"levelOrder([3,9,20,null,null,15,7])\")\ncase(\"levelOrder(T([1]))\", [[1]], show=\"levelOrder([1])\")\ncase(\"levelOrder(T([]))\", [], show=\"levelOrder([])\")\n", "Validate Binary Search Tree": "\ncase(\"isValidBST(T([2,1,3]))\", True, show=\"isValidBST([2,1,3])\")\ncase(\"isValidBST(T([5,1,4,None,None,3,6]))\", False, show=\"isValidBST([5,1,4,null,null,3,6])\")\ncase(\"isValidBST(T([5,4,6,None,None,3,7]))\", False, show=\"isValidBST([5,4,6,null,null,3,7])\")\ncase(\"isValidBST(T([2,2,2]))\", False, show=\"isValidBST([2,2,2])\")\n", "Lowest Common Ancestor of a BST": "\ncase(\"(lambda r: lowestCommonAncestor(r, find(r,2), find(r,8)).val)(T([6,2,8,0,4,7,9,None,None,3,5]))\", 6, show=\"LCA of 2 and 8 in [6,2,8,0,4,7,9,null,null,3,5]\")\ncase(\"(lambda r: lowestCommonAncestor(r, find(r,2), find(r,4)).val)(T([6,2,8,0,4,7,9,None,None,3,5]))\", 2, show=\"LCA of 2 and 4 in [6,2,8,0,4,7,9,null,null,3,5]\")\ncase(\"(lambda r: lowestCommonAncestor(r, find(r,2), find(r,1)).val)(T([2,1]))\", 2, show=\"LCA of 2 and 1 in [2,1]\")\n", "Kth Smallest Element in a BST": "\ncase(\"kthSmallest(T([3,1,4,None,2]), 1)\", 1, show=\"kthSmallest([3,1,4,null,2], 1)\")\ncase(\"kthSmallest(T([5,3,6,2,4,None,None,1]), 3)\", 3, show=\"kthSmallest([5,3,6,2,4,null,null,1], 3)\")\ncase(\"kthSmallest(T([2,1,3]), 3)\", 3, show=\"kthSmallest([2,1,3], 3)\")\n", "Construct Binary Tree from Preorder and Inorder": "\ncase(\"toT(buildTree([3,9,20,15,7], [9,3,15,20,7]))\", [3,9,20,None,None,15,7], show=\"buildTree([3,9,20,15,7], [9,3,15,20,7])\")\ncase(\"toT(buildTree([-1], [-1]))\", [-1], show=\"buildTree([-1], [-1])\")\ncase(\"toT(buildTree([1,2,3], [3,2,1]))\", [1,2,None,3], show=\"buildTree([1,2,3], [3,2,1])\")\n", "Number of Islands": "\ncase('numIslands([[\"1\",\"1\",\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"0\",\"0\"]])', 1, show=\"one big island\")\ncase('numIslands([[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]])', 3, show=\"three islands\")\ncase('numIslands([[\"0\"]])', 0, show=\"all water\")\ncase('numIslands([[\"1\",\"0\",\"1\"],[\"0\",\"1\",\"0\"],[\"1\",\"0\",\"1\"]])', 5, show=\"diagonals don't connect\")\n", "Clone Graph": "\ncase(\"clone_case(cloneGraph, [[2,4],[1,3],[2,4],[1,3]])\", [[2,4],[1,3],[2,4],[1,3]], show=\"square: [[2,4],[1,3],[2,4],[1,3]]\")\ncase(\"clone_case(cloneGraph, [[]])\", [[]], show=\"single node [[]]\")\ncase(\"clone_case(cloneGraph, [])\", [], show=\"empty graph\")\n", "Course Schedule": "\ncase(\"canFinish(2, [[1,0]])\", True)\ncase(\"canFinish(2, [[1,0],[0,1]])\", False)\ncase(\"canFinish(3, [[1,0],[2,1]])\", True)\ncase(\"canFinish(4, [[1,0],[2,1],[3,2],[1,3]])\", False)\n", "Rotting Oranges": "\ncase(\"orangesRotting([[2,1,1],[1,1,0],[0,1,1]])\", 4)\ncase(\"orangesRotting([[2,1,1],[0,1,1],[1,0,1]])\", -1)\ncase(\"orangesRotting([[0,2]])\", 0)\ncase(\"orangesRotting([[0]])\", 0)\n", "Kth Largest Element in an Array": "\ncase(\"findKthLargest([3,2,1,5,6,4], 2)\", 5)\ncase(\"findKthLargest([3,2,3,1,2,4,5,5,6], 4)\", 4)\ncase(\"findKthLargest([1], 1)\", 1)\ncase(\"findKthLargest([2,1], 2)\", 1)\n", "Merge Intervals": "\ncase(\"merge([[1,3],[2,6],[8,10],[15,18]])\", [[1,6],[8,10],[15,18]], \"sorted\")\ncase(\"merge([[1,4],[4,5]])\", [[1,5]], \"sorted\")\ncase(\"merge([[1,4],[0,4]])\", [[0,4]], \"sorted\")\ncase(\"merge([[1,4],[2,3]])\", [[1,4]], \"sorted\")\n", "Non-overlapping Intervals": "\ncase(\"eraseOverlapIntervals([[1,2],[2,3],[3,4],[1,3]])\", 1)\ncase(\"eraseOverlapIntervals([[1,2],[1,2],[1,2]])\", 2)\ncase(\"eraseOverlapIntervals([[1,2],[2,3]])\", 0)\ncase(\"eraseOverlapIntervals([[1,100],[11,22],[1,11],[2,12]])\", 2)\n", "Find Median from Data Stream": "\ncase('ops(\"MedianFinder\", [\"MedianFinder\",\"addNum\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\"], [[],[1],[2],[],[3],[]])', [None,None,None,1.5,None,2.0], \"ops\", show=\"add 1, 2 \u2192 median; add 3 \u2192 median\")\ncase('ops(\"MedianFinder\", [\"MedianFinder\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\"], [[],[5],[],[-1],[],[10],[]])', [None,None,5.0,None,2.0,None,5.0], \"ops\", show=\"add 5 \u2192 median; add -1 \u2192 median; add 10 \u2192 median\")\n", "Subsets": "\ncase(\"subsets([1,2,3])\", [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]], \"deep\")\ncase(\"subsets([0])\", [[],[0]], \"deep\")\n", "Permutations": "\ncase(\"permute([1,2,3])\", [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]], \"sorted\")\ncase(\"permute([0,1])\", [[0,1],[1,0]], \"sorted\")\ncase(\"permute([1])\", [[1]], \"sorted\")\n", "Combination Sum": "\ncase(\"combinationSum([2,3,6,7], 7)\", [[2,2,3],[7]], \"deep\")\ncase(\"combinationSum([2,3,5], 8)\", [[2,2,2,2],[2,3,3],[3,5]], \"deep\")\ncase(\"combinationSum([2], 1)\", [], \"deep\")\n", "Word Search": "\ncase('exist([[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], \"ABCCED\")', True, show='exist(board, \"ABCCED\")')\ncase('exist([[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], \"SEE\")', True, show='exist(board, \"SEE\")')\ncase('exist([[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], \"ABCB\")', False, show='exist(board, \"ABCB\")')\ncase('exist([[\"a\"]], \"a\")', True)\n", "Climbing Stairs": "\ncase(\"climbStairs(2)\", 2)\ncase(\"climbStairs(3)\", 3)\ncase(\"climbStairs(5)\", 8)\ncase(\"climbStairs(30)\", 1346269)\n", "House Robber": "\ncase(\"rob([1,2,3,1])\", 4)\ncase(\"rob([2,7,9,3,1])\", 12)\ncase(\"rob([2,1,1,2])\", 4)\ncase(\"rob([5])\", 5)\n", "Coin Change": "\ncase(\"coinChange([1,2,5], 11)\", 3)\ncase(\"coinChange([2], 3)\", -1)\ncase(\"coinChange([1], 0)\", 0)\ncase(\"coinChange([186,419,83,408], 6249)\", 20)\n", "Longest Increasing Subsequence": "\ncase(\"lengthOfLIS([10,9,2,5,3,7,101,18])\", 4)\ncase(\"lengthOfLIS([0,1,0,3,2,3])\", 4)\ncase(\"lengthOfLIS([7,7,7,7])\", 1)\ncase(\"lengthOfLIS([4,10,4,3,8,9])\", 3)\n", "LRU Cache": "\ncase('ops(\"LRUCache\", [\"LRUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"put\",\"get\",\"get\",\"get\"], [[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]])', [None,None,None,1,None,-1,None,-1,3,4], \"ops\", show=\"capacity 2: put 1, put 2, get 1, put 3, get 2, put 4, get 1, 3, 4\")\ncase('ops(\"LRUCache\", [\"LRUCache\",\"put\",\"put\",\"get\",\"get\"], [[1],[2,1],[2,2],[2],[1]])', [None,None,None,2,-1], \"ops\", show=\"capacity 1: put 2=1, put 2=2, get 2, get 1\")\n", "Implement Trie (Prefix Tree)": "\ncase('ops(\"Trie\", [\"Trie\",\"insert\",\"search\",\"search\",\"startsWith\",\"insert\",\"search\"], [[],[\"apple\"],[\"apple\"],[\"app\"],[\"app\"],[\"app\"],[\"app\"]])', [None,None,True,False,True,None,True], \"ops\", show=\"insert apple; search apple, app; startsWith app; insert app; search app\")\ncase('ops(\"Trie\", [\"Trie\",\"insert\",\"startsWith\",\"search\"], [[],[\"a\"],[\"b\"],[\"a\"]])', [None,None,False,True], \"ops\", show=\"insert a; startsWith b; search a\")\n", "Merge k Sorted Lists": "\ncase(\"toL(mergeKLists([L([1,4,5]), L([1,3,4]), L([2,6])]))\", [1,1,2,3,4,4,5,6], show=\"merge [1\u21924\u21925, 1\u21923\u21924, 2\u21926]\")\ncase(\"toL(mergeKLists([]))\", [], show=\"merge []\")\ncase(\"toL(mergeKLists([L([])]))\", [], show=\"merge [empty]\")\n"};
+const CKEY="applePrep.code.v1";
+let CODE={};try{CODE=JSON.parse(localStorage.getItem(CKEY)||"{}")}catch(e){}
+const OPEN=new Set();
+let codeTimer;
+function saveCode(){try{localStorage.setItem(CKEY,JSON.stringify(CODE));return true;}catch(e){return false;}}
+const starter=name=>(PROBS[name]||["",""])[1];
+function save(){try{localStorage.setItem(KEY,JSON.stringify({done:S.done,flag:S.flag,tab:S.tab,day:S.day,deck:S.deck,ci:S.ci}));}catch(e){}}
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pid=(d,i)=>`d${d}p${i}`;
+const dayDone=d=>DAYS[d].p.every((_,i)=>S.done[pid(d,i)]);
+const doneCount=d=>DAYS[d].p.filter((_,i)=>S.done[pid(d,i)]).length;
+const totalP=DAYS.reduce((a,d)=>a+d.p.length,0);
+const totalDone=()=>Object.values(S.done).filter(Boolean).length;
+const nextDay=()=>{const i=DAYS.findIndex((_,d)=>!dayDone(d));return i;};
+const flagged=()=>Object.keys(S.flag).filter(k=>S.flag[k]).length;
+const app=document.getElementById("app");
+
+function renderPlan(){
+  const nd=nextDay();
+  const pct=Math.round(totalDone()/totalP*100);
+  let h=`<header class="top"><h1>Two weeks to the loop</h1>
+  <p>${nd===-1?"Every day is boarded. Skim your flags and rest before the interview.":`Next up: Day ${nd+1}, ${esc(DAYS[nd].t.toLowerCase())}. About 90 minutes a day.`}</p>${offlineHTML()}</header>
+  <div class="meter"><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div><span>${totalDone()} / ${totalP} solved</span></div>`;
+  DAYS.forEach((d,i)=>{
+    if(i===0)h+=`<div class="week">Week one: linear structures</div>`;
+    if(i===7)h+=`<div class="week">Week two: trees, graphs and beyond</div>`;
+    const dn=dayDone(i),c=doneCount(i);
+    const cls=["pass",dn?"boarded":"",i===nd?"next":"",d.review?"review":""].join(" ");
+    h+=`<button class="${cls}" data-day="${i}" aria-label="Day ${i+1}: ${esc(d.t)}, ${c} of ${d.p.length} done">
+      <span class="stub"><small>Day</small><b>${i+1}</b></span>
+      <span class="body"><h3>${esc(d.t)}</h3><div class="gate">${esc(d.gate)}</div>
+      <div class="row"><span class="pips">${d.p.map((_,j)=>`<i class="${S.done[pid(i,j)]?"on":""}"></i>`).join("")}</span>
+      <span class="status">${dn?"Boarded":i===nd?"Up next":`${c}/${d.p.length}`}</span></div></span></button>`;
+  });
+  app.innerHTML=h;
+}
+
+function renderDay(i){
+  const d=DAYS[i];
+  let h=`<button class="back" data-go="plan">‹ All days</button>
+  <div class="dayhead"><b>${i+1}</b><h2>${esc(d.t)}</h2></div>
+  <p class="goal">${esc(d.goal)}</p>
+  <h4>${d.review?"How to run today":"What to know"}</h4><ul class="notes">${d.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
+  <h4>${d.review?"Mock timing":"Template to memorize"}</h4><pre><code>${esc(d.code)}</code></pre>
+  <h4>${d.review?"Mock problems":"Problems"}</h4>
+  <p class="goal" style="margin-top:0">Try it before revealing anything. Write your solution, run the tests, then compare with the approach.</p>`;
+  const KEYS=["⇥","(",")","[","]","{","}",":","=","<",">","_","\"","'","#","+","-","*","/","%","!",",","."];
+  d.p.forEach((p,j)=>{
+    const id=pid(i,j),done=!!S.done[id],fl=!!S.flag[id],open=OPEN.has(id);
+    const has=CODE[id]!==undefined&&CODE[id]!==starter(p[0]);
+    const stmt=PROBS[p[0]]?PROBS[p[0]][0]:"";
+    h+=`<div class="prob ${done?"done":""}">
+      <div class="ptop"><button class="check" data-toggle="${id}" aria-pressed="${done}" aria-label="Mark ${esc(p[0])} solved">${done?"✓":""}</button>
+      <div class="pname"><strong>${esc(p[0])}</strong><span class="diff ${p[1]}">${{E:"Easy",M:"Medium",H:"Hard"}[p[1]]}</span>${has?`<span class="saved">Code saved</span>`:""}</div>
+      <button class="flagbtn ${fl?"on":""}" data-flag="${id}" aria-pressed="${fl}">${fl?"Flagged":"Flag"}</button></div>
+      ${stmt?`<p class="stmt">${esc(stmt)}</p>`:""}
+      <div class="reveals"><button class="reveal" aria-expanded="${open}" data-ed="${id}">Write code</button><button class="reveal" aria-expanded="false" data-r="h${id}">Hint</button><button class="reveal" aria-expanded="false" data-r="a${id}">Approach</button></div>
+      <div class="editor" id="ed${id}" ${open?"":"hidden"}>
+        <div class="keybar" role="toolbar" aria-label="Code symbols">${KEYS.map(k=>`<button type="button" data-key="${esc(k)}" aria-label="${k==="⇥"?"Indent":"Insert "+esc(k)}">${esc(k)}</button>`).join("")}</div>
+        <textarea data-code="${id}" data-name="${esc(p[0])}" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" wrap="off" aria-label="Your solution for ${esc(p[0])}">${esc(CODE[id]??starter(p[0]))}</textarea>
+        <div class="edrow"><button type="button" class="runbtn" data-run="${id}" data-name="${esc(p[0])}" ${PY.state==="ready"?"":"disabled"}>Run tests</button><span class="pystat">${pyStatusText()}</span></div>
+        <div class="edfoot"><span id="st${id}">${has?"Saved on this phone":"Starter code"}</span><button type="button" data-restart="${id}">Reset to starter</button></div>
+        <div class="results" aria-live="polite">${RESULTS[id]?renderResults(RESULTS[id]):""}</div>
+      </div>
+      <p class="rtext" id="h${id}" hidden>${esc(p[2])}</p><p class="rtext" id="a${id}" hidden>${esc(p[3])}</p></div>`;
+  });
+  if(i<DAYS.length-1)h+=`<button class="reveal" style="margin-top:8px" data-day="${i+1}">Go to day ${i+2}</button>`;
+  app.innerHTML=h;
+}
+
+function renderDrill(){
+  const deck=S.deck==="complex"?COMPLEX:CARDS;
+  if(S.ci>=deck.length)S.ci=0;
+  const c=deck[S.ci];
+  app.innerHTML=`<header class="top"><h1>Drill</h1><p>Read the clue, name the pattern in your head, then tap to check. Works well in a queue or at the gate.</p></header>
+  <div class="deckbar"><button class="chip" data-deck="patterns" aria-pressed="${S.deck!=="complex"}">Spot the pattern</button><button class="chip" data-deck="complex" aria-pressed="${S.deck==="complex"}">Complexity</button></div>
+  <button class="flash" data-flip aria-live="polite"><span class="q">${esc(c[0])}</span>
+  ${S.flip?`<span class="a"><b>${esc(c[1])}</b>${esc(c[2])}</span>`:`<span class="tap">Tap to reveal</span>`}</button>
+  <div class="flashnav"><button data-card="-1">Previous</button><span>${S.ci+1} of ${deck.length}</span><button data-card="1">Next</button></div>
+  <p class="goal" style="margin-top:22px">You have ${flagged()} flagged problem${flagged()===1?"":"s"} to revisit on Day 7 and Day 14.</p>`;
+}
+
+function renderPlaybook(){
+  app.innerHTML=`<header class="top"><h1>Playbook</h1><p>How to run any coding round, start to finish.</p></header>
+  <h4>In the interview</h4><ol class="steps">
+  <li><b>Restate and clarify</b>Input size, value ranges, duplicates, empty input, what to return. Write one small example.</li>
+  <li><b>Say the brute force</b>With its complexity. It proves you understand the problem and gives you a fallback.</li>
+  <li><b>Find the bottleneck</b>Name the repeated work, pick the pattern that removes it, and agree the plan before coding.</li>
+  <li><b>Code cleanly</b>Clear names, small helpers, narrate as you go. Don't go silent.</li>
+  <li><b>Test by hand</b>Trace your example line by line, then edge cases: empty, one element, all equal, negatives.</li>
+  <li><b>State complexity and trade-offs</b>Time and space, and what you'd change if memory or input size were different.</li></ol>
+  <h4>Complexity cheat sheet</h4><div class="tablewrap"><table>
+  <tr><th>Input size n</th><th>Target</th><th>Typical tools</th></tr>
+  <tr><td>≤ 20</td><td>O(2ⁿ), O(n!)</td><td>Backtracking</td></tr>
+  <tr><td>≤ 1,000</td><td>O(n²)</td><td>Nested loops, 2-D DP</td></tr>
+  <tr><td>≤ 10⁵</td><td>O(n log n)</td><td>Sorting, heaps, binary search</td></tr>
+  <tr><td>≤ 10⁷</td><td>O(n)</td><td>Hashing, two pointers, window</td></tr>
+  <tr><td>Huge</td><td>O(log n), O(1)</td><td>Binary search, math</td></tr></table></div>
+  <h4>Apple-specific habits</h4><ul class="plain">
+  <li>Loops are usually run by the hiring team, so questions often lean practical. Expect follow-ups like "how would this behave with a million items?" or "how would you test it?"</li>
+  <li>Ask your recruiter which language and environment to expect (shared editor, whiteboard, or your laptop). Swift is welcome for iOS roles; otherwise use the language you're fastest in.</li>
+  <li>Talk about readability and edge cases. Clean, correct code beats a clever one-liner.</li>
+  <li>Prepare a two-minute story about a project you're proud of. It often opens the coding round.</li></ul>
+  <h4>Studying without a laptop</h4><ul class="plain">
+  <li>Open "Write code" and solve it before revealing the hint. The symbol row above the keyboard saves you from hunting for brackets and colons.</li>
+  <li>Enter keeps your indentation and adds four spaces after a line ending in a colon.</li>
+  <li>Run tests checks your code against a handful of examples, offline. Before you run, trace one example by hand: in the interview you usually can't run anything.</li>
+  <li>Once the Plan screen says "Ready offline", everything works in airplane mode, including Run tests.</li>
+  <li>Use the Drill tab for dead time: security lines, taxis, the minutes before boarding.</li>
+  <li>On days with a laptop, type up two of that day's problems and run them on LeetCode.</li></ul>
+  <button class="reset" data-reset>Reset all progress</button>`;
+}
+
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===S.tab?"page":"false"));
+  if(S.tab==="plan"){S.day!==null?renderDay(S.day):renderPlan();}
+  else if(S.tab==="drill")renderDrill();
+  else renderPlaybook();
+  save();
+}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.tab){S.tab=t.dataset.tab;if(t.dataset.tab==="plan")S.day=null;render();scrollTo(0,0);return;}
+  if(t.dataset.day!==undefined){S.tab="plan";S.day=+t.dataset.day;render();scrollTo(0,0);return;}
+  if(t.dataset.go==="plan"){S.day=null;render();scrollTo(0,0);return;}
+  if(t.dataset.toggle){const y=scrollY;S.done[t.dataset.toggle]=!S.done[t.dataset.toggle];render();scrollTo(0,y);return;}
+  if(t.dataset.flag){const y=scrollY;S.flag[t.dataset.flag]=!S.flag[t.dataset.flag];render();scrollTo(0,y);return;}
+  if(t.dataset.r){const el=document.getElementById(t.dataset.r);const open=el.hidden;el.hidden=!open;t.setAttribute("aria-expanded",open);return;}
+  if(t.dataset.deck){S.deck=t.dataset.deck;S.ci=0;S.flip=false;render();return;}
+  if(t.hasAttribute("data-flip")){S.flip=!S.flip;render();return;}
+  if(t.dataset.card){const n=(S.deck==="complex"?COMPLEX:CARDS).length;S.ci=(S.ci+ +t.dataset.card+n)%n;S.flip=false;render();return;}
+  if(t.dataset.ed){const id=t.dataset.ed,el=document.getElementById("ed"+id);const open=el.hidden;el.hidden=!open;t.setAttribute("aria-expanded",open);open?OPEN.add(id):OPEN.delete(id);if(open){const ta=el.querySelector("textarea");ta.focus({preventScroll:true});ta.setSelectionRange(ta.value.length,ta.value.length);}return;}
+  if(t.dataset.run){runTests(t);return;}
+  if(t.dataset.restart){const id=t.dataset.restart,ta=document.querySelector(`textarea[data-code="${id}"]`);if(confirm("Replace your code with the starter?")){ta.value=starter(ta.dataset.name);delete CODE[id];saveCode();document.getElementById("st"+id).textContent="Starter code";}return;}
+  if(t.hasAttribute("data-reset")){if(confirm("Clear all solved marks, flags and saved code?")){S.done={};S.flag={};CODE={};saveCode();OPEN.clear();render();}}
+});
+
+const BRY=new URL(".",location.href).href.replace(/\/$/,"");
+const PY={state:"idle"};
+const RESULTS={};
+function pyStatusText(){
+  return {idle:"Python loading…",loading:"Python loading…",ready:"Python ready",
+    error:"Python didn't load. Open the app once while online.",
+    blocked:"Running code isn't supported in this view."}[PY.state];
+}
+function updatePy(){
+  document.querySelectorAll(".pystat").forEach(el=>el.textContent=pyStatusText());
+  document.querySelectorAll(".runbtn").forEach(b=>{b.disabled=PY.state!=="ready";});
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("load failed"));document.head.appendChild(s);});}
+async function initPython(){
+  if(PY.state!=="idle")return;
+  PY.state="loading";updatePy();
+  try{new Function("return 1")();}catch(e){PY.state="blocked";updatePy();return;}
+  try{
+    window.__BRYTHON__=window.__BRYTHON__||{brython_path:BRY+"/"};
+    await loadScript(BRY+"/brython.min.js");
+    await loadScript(BRY+"/brython_stdlib.js");
+    await new Promise(r=>setTimeout(r,30));
+    window.brython({debug:0,indexeddb:false});
+    window.__BRYTHON__.runPythonSource(PY_HARNESS+"\nfrom browser import window\nwindow.__prepRun = run\n","prepharness");
+    if(typeof window.__prepRun!=="function")throw new Error("init failed");
+    PY.state="ready";
+  }catch(e){PY.state="error";}
+  updatePy();
+}
+function errLine(e){return `<b>${esc(e.type)}${e.line?` on line ${e.line}`:""}</b>: ${esc(e.msg)}`;}
+function renderResults(r){
+  if(r.fatal)return `<p class="rerr"><b>Couldn't run your code</b>: ${esc(r.fatal)}</p>`;
+  if(r.compile)return `<p class="rerr">${errLine(r.compile)}</p>${r.stdout?`<details open><summary>Printed output</summary><pre>${esc(r.stdout)}</pre></details>`:""}`;
+  const n=r.cases.length,ok=r.cases.filter(c=>c.ok).length,all=ok===n&&n>0;
+  let h=`<p class="rsum ${all?"pass":"fail"}">${all?`All ${n} tests passed`:`${ok} of ${n} tests passed`}</p>`;
+  if(r.autoMarked)h+=`<p class="kv" style="margin:0 0 8px">Marked as solved.</p>`;
+  h+=`<ul class="rlist">`+r.cases.map(c=>{
+    let body=`<code>${esc(c.label)}</code>`;
+    if(c.skipped)body+=`<div class="kv">Skipped after the step limit.</div>`;
+    else if(c.err)body+=`<div class="kv">Expected <b>${esc(c.exp)}</b></div><div class="kv">${errLine(c.err)}</div>`;
+    else if(!c.ok)body+=`<div class="kv">Expected <b>${esc(c.exp)}</b></div><div class="kv">Got <b>${esc(c.got)}</b></div>`;
+    return `<li class="${c.ok?"ok":"bad"}"><span class="mk">${c.ok?"✓":"✗"}</span><div>${body}</div></li>`;
+  }).join("")+`</ul>`;
+  if(r.stdout)h+=`<details><summary>Printed output</summary><pre>${esc(r.stdout)}</pre></details>`;
+  return h;
+}
+function runTests(btn){
+  const id=btn.dataset.run,name=btn.dataset.name;
+  const ta=document.querySelector(`textarea[data-code="${id}"]`);
+  if(PY.state!=="ready"||!ta)return;
+  CODE[id]=ta.value;saveCode();
+  btn.disabled=true;btn.textContent="Running…";
+  setTimeout(()=>{
+    let r;
+    try{r=JSON.parse(window.__prepRun(ta.value,PY_TESTS[name]));}
+    catch(e){r={fatal:String((e&&e.message)||e)};}
+    const all=!r.fatal&&!r.compile&&r.cases.length>0&&r.cases.every(c=>c.ok);
+    if(all&&!S.done[id]){S.done[id]=true;r.autoMarked=true;}
+    RESULTS[id]=r;
+    const y=scrollY;render();scrollTo(0,y);
+  },40);
+}
+
+function insertAt(ta,text){
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  ta.setRangeText(text,s,e,"end");
+  ta.dispatchEvent(new Event("input",{bubbles:true}));
+}
+function pressKey(ev){
+  const b=ev.target.closest("[data-key]");if(!b)return;
+  ev.preventDefault(); // keep the textarea focused so the keyboard stays up
+  const ta=b.closest(".editor").querySelector("textarea");
+  if(document.activeElement!==ta)ta.focus({preventScroll:true});
+  insertAt(ta,b.dataset.key==="⇥"?"    ":b.dataset.key);
+}
+document.addEventListener("touchstart",pressKey,{passive:false});
+document.addEventListener("mousedown",pressKey);
+
+document.addEventListener("input",e=>{
+  const ta=e.target;if(!ta.dataset||!ta.dataset.code)return;
+  const id=ta.dataset.code;CODE[id]=ta.value;
+  const st=document.getElementById("st"+id);if(st)st.textContent="Saving…";
+  clearTimeout(codeTimer);
+  codeTimer=setTimeout(()=>{const ok=saveCode();if(st)st.textContent=ok?"Saved on this phone":"Couldn't save. Storage may be full or blocked.";},400);
+});
+
+document.addEventListener("keydown",e=>{
+  const ta=e.target;if(!ta.dataset||!ta.dataset.code||e.isComposing)return;
+  if(e.key==="Tab"){e.preventDefault();insertAt(ta,"    ");return;}
+  if(e.key==="Enter"){
+    const v=ta.value,s=ta.selectionStart;
+    const lineStart=v.lastIndexOf("\n",s-1)+1,line=v.slice(lineStart,s);
+    let indent=line.match(/^ */)[0];
+    if(/:\s*(#.*)?$/.test(line))indent+="    ";
+    e.preventDefault();insertAt(ta,"\n"+indent);
+  }
+});
+let OFFLINE="none";
+function offlineHTML(){
+  if(OFFLINE==="ready")return `<p class="offline on">✓ Ready offline</p>`;
+  if(OFFLINE==="pending")return `<p class="offline">Saving an offline copy… keep the app open and online for a moment.</p>`;
+  return "";
+}
+async function checkOffline(){
+  try{
+    const hit=await caches.match(new URL("brython_stdlib.js",location.href).href);
+    const next=hit?"ready":"pending";
+    if(next!==OFFLINE){OFFLINE=next;if(S.tab==="plan"&&S.day===null)render();}
+    if(!hit)setTimeout(checkOffline,1500);
+  }catch(e){}
+}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js",{scope:"./"}).then(()=>checkOffline()).catch(()=>{});
+}
+render();
+setTimeout(initPython,300);
+</script>
+</body>
+</html>
