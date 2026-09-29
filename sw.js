@@ -1,4 +1,4 @@
-const CACHE = "coding-prep-v1";
+const CACHE = "coding-prep-v2";
 const FONTS = "coding-prep-fonts";
 const FILES = ["./", "./index.html", "./brython.min.js", "./brython_stdlib.js",
   "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
